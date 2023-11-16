@@ -1,49 +1,52 @@
-from typing import Tuple
 from selenium import webdriver
-import subprocess
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
-def get_microsoft_creds() -> Tuple[str, str]:
-    creds = []
+def await_essential_element(query_selector: str) -> WebElement:
+    """
+    Tells the webdriver to wait for an element of a particular query selector.
+    If the element is not found within the global WAIT_PERIOD, then the driver
+    will quit and the program will exit with a status of 1
 
-    for value_to_fetch in ("username", "password"):
-        fetch_command = (
-            "kpcli --kdb=$HOME/Sync/secrets.kdbx --pwfile=keepass.txt --command "
-            f"\"get Passwords/Gaming/Microsoft {value_to_fetch}\" | sed '/WARNING.*/d' | "
-            "sed '/.*It may be opened.*/d' | sed '/Please consider.*/d' | "
-            "sed '/https:\\/\\/github.com\\/sponsors\\/hightowe/d'"
+    :param query_selector: The string representing the CSS selector of the element
+    to wait for
+    :returns: Return the WebElement represented by the query_selector
+    """
+
+    try:
+        elem = WebDriverWait(DRIVER, WAIT_PERIOD).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, query_selector)),
+            "Could not find element: " + query_selector,
         )
+    except Exception as e:
+        print(e)
+        DRIVER.quit()
+        quit(1)
 
-        completed_process = subprocess.run(fetch_command, shell=True, executable="/bin/bash", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        if completed_process.returncode == 0:
-            creds.append(completed_process.stdout.strip()[5:])
-        else:
-            raise ValueError(f"Failed to parse {value_to_fetch}: {completed_process.stderr}")
-
-    return (creds[0], creds[1])
+    return elem
 
 
-def get_microsoft_otp() -> str:
-    fetch_command = (
-        "kpcli --kdb=$HOME/Sync/secrets.kdbx --pwfile=keepass.txt --command "
-        f"\"otp Passwords/Gaming/Microsoft\" | sed '/WARNING.*/d' | "
-        "sed '/.*It may be opened.*/d' | sed '/Please consider.*/d' | "
-        "sed '/https:\\/\\/github.com\\/sponsors\\/hightowe/d'"
+def try_await_element(query_selector: str) -> WebElement:
+    """
+    Tells the webdriver to wait for an element of a particular query selector.
+    If the element is not found within the global WAIT_PERIOD, then raise
+    `selenium.common.exceptions.TimeoutException`
+
+    :param query_selector: The string representing the CSS selector of the element
+    to wait for
+    :returns: Return the WebElement represented by the query_selector
+    :raises: :exc: Raise `selenium.common.exceptions.TimeoutException` if the
+    element is not found within `WAIT_PERIOD`
+    """
+
+    return WebDriverWait(DRIVER, WAIT_PERIOD).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, query_selector)),
+        "Could not find element: " + query_selector,
     )
 
-    completed_process = subprocess.run(fetch_command, shell=True, executable="/bin/bash", stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if completed_process.returncode == 0:
-        return completed_process.stdout.strip()[5:]
-    else:
-        raise ValueError(f"Failed to parse otp: {completed_process.stderr}")
 
-
-def microsoft_signin():
-    username, password = "", ""
-
-    try: 
-        username, password = get_microsoft_creds()
-    except ValueError as e:
-        raise e
-
-    
+WAIT_PERIOD = 10
+DRIVER = webdriver.Firefox()
