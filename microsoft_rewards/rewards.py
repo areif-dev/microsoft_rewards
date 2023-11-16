@@ -11,7 +11,8 @@
 # The options are at input.rqOption
 
 from selenium.webdriver.common.by import By
-from microsoft_rewards import DRIVER, try_await_element
+from microsoft_rewards import DRIVER, WAIT_PERIOD, try_await_element
+import time
 
 
 def handle_daily_set():
@@ -21,29 +22,38 @@ def handle_daily_set():
     """
 
     # First make sure that the rewards cards have loaded
-    try_await_element("mee-card")
-    all_rewards = DRIVER.find_elements(By.CSS_SELECTOR, "mee-card")
-    
-    for card in all_rewards[0: 3]:
+    try_await_element("mee-rewards-daily-set-item-content")
+    time.sleep(WAIT_PERIOD)
+    all_daily_sets = DRIVER.find_elements(
+        By.XPATH, "//mee-rewards-daily-set-item-content/div/a"
+    )
+
+    for i, card in enumerate(all_daily_sets[0:3]):
+        print(i)
         card.click()
 
         try:
             try_await_element("a.wk_choicesInstLink")
             print("Found daily quiz")
+            continue
             # handle_daily_quiz()
-        except: 
-            pass 
-
-        try: 
-            try_await_element("#btoption0")
-            print("Found daily poll")
-            # handle_daily_poll()
-        except: 
+        except:
             pass
 
-        try: 
+        try:
+            try_await_element("#btoption0")
+            print("Found daily poll")
+            continue
+            # handle_daily_poll()
+        except:
+            pass
+
+        try:
             try_await_element("input#rqStartQuiz[type=button]")
             print("Found warpspeed quiz")
+            continue
             # handle_warpspeed_quiz()
         except:
             pass
+
+        print("Found freebee")
