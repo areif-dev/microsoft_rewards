@@ -26,7 +26,7 @@ def get_microsoft_creds() -> Tuple[str, str]:
             text=True,
         )
         if completed_process.returncode == 0:
-            creds.append(completed_process.stdout.strip()[5:])
+            creds.append(completed_process.stdout.strip())
         else:
             raise ValueError(
                 f"Failed to parse {value_to_fetch}: {completed_process.stderr}"
@@ -52,7 +52,7 @@ def get_microsoft_otp() -> str:
         text=True,
     )
     if completed_process.returncode == 0:
-        return completed_process.stdout.strip()[5:]
+        return completed_process.stdout.strip()
     else:
         raise ValueError(f"Failed to parse otp: {completed_process.stderr}")
 
