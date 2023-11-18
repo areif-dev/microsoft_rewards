@@ -5,37 +5,44 @@ import time
 import random
 
 
-def handle_warpspeed_quiz(): 
+def handle_warpspeed_quiz():
+    """Callback for when a warpspeed quiz is entered"""
 
+    print("Entering warpspeed quiz")
     try_await_element("input#rqStartQuiz[type=button]").click()
 
     for _ in range(3):
         for j in range(3):
             try:
+                print(f"Answering question {j}")
                 try_await_element(f"input#rqAnswerOption{j}").click()
                 time.sleep(SHORT_WAIT)
             except:
+                print(f"Failed to answer question {j}")
                 return
 
 
 def handle_daily_quiz():
+    """Handles simple daily quizzes that are 5 to 10 questions long"""
+
+    print("Entering daily quiz")
     DRIVER.get("https://www.bing.com/search?q=weekly+quiz")
-    time.sleep(SHORT_WAIT)
+    time.sleep(SHORT_WAIT / 2)
     while True:
         try:
-            print("Looking for answer")
+            print("Answering question")
             link = try_await_element("a.wk_choicesInstLink")
             DRIVER.get(str(link.get_attribute("href")))
-            time.sleep(SHORT_WAIT)
+            time.sleep(SHORT_WAIT / 2)
         except Exception as e:
-            print("Did not find answer:", e)
+            print("Failed to answer question", e)
             return
 
-        try: 
+        try:
             try_await_element("input[type=submit][value='Next question']").click()
         except:
             try_await_element("input[type=submit][value='Get your score']").click()
-        time.sleep(SHORT_WAIT)
+        time.sleep(SHORT_WAIT / 2)
 
 
 def handle_daily_set():
@@ -44,6 +51,7 @@ def handle_daily_set():
     daily set cards are not found within `WAIT_PERIOD`
     """
 
+    print("Beginning daily set")
     original_window = DRIVER.current_window_handle
 
     # First make sure that the rewards cards have loaded
@@ -87,16 +95,25 @@ def handle_daily_set():
 
 
 def handle_more_activities():
-    more_activies_cards = DRIVER.find_elements(By.CSS_SELECTOR, "mee-rewards-more-activities-card-item")
+    """Click all cards that are not already activated in the "More activies" section"""
+
+    print("Beginning more activities")
+    more_activies_cards = DRIVER.find_elements(
+        By.CSS_SELECTOR, "mee-rewards-more-activities-card-item"
+    )
 
     for card in more_activies_cards:
         try:
-            card.find_element(By.XPATH, ".//span[contains(@class, 'mee-icon mee-icon-AddMedium')]").click()
+            card.find_element(
+                By.XPATH, ".//span[contains(@class, 'mee-icon mee-icon-AddMedium')]"
+            ).click()
         except:
             continue
 
 
 def run_searches():
+    """Send 30 different searches through Bing"""
+
     print("Running searches")
     lorem = """
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
@@ -115,7 +132,9 @@ def run_searches():
     Fusce ut placerat orci nulla pellentesque dignissim enim sit. In metus 
     vulputate eu scelerisque felis imperdiet proin. Nibh praesent tristique 
     magna sit amet purus gravida.
-    """.split(" ")
+    """.split(
+        " "
+    )
 
     DRIVER.get("https://www.bing.com/search?q=something")
 
@@ -139,4 +158,3 @@ def run_searches():
         search_input.clear()
         search_input.send_keys(" ".join(words), Keys.ENTER)
         time.sleep(1)
-

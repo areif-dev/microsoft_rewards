@@ -1,6 +1,10 @@
 from microsoft_rewards import try_await_element, SHORT_WAIT
 from microsoft_rewards.authentication import microsoft_login
-from microsoft_rewards.rewards import handle_daily_set, handle_more_activities, run_searches
+from microsoft_rewards.rewards import (
+    handle_daily_set,
+    handle_more_activities,
+    run_searches,
+)
 import time
 
 
@@ -16,4 +20,3 @@ if __name__ == "__main__":
         print("Failed to handle daily activities")
 
     run_searches()
-

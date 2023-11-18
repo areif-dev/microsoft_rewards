@@ -9,6 +9,13 @@ import time
 
 
 def get_microsoft_creds() -> Tuple[str, str]:
+    """
+    Retrieve the Microsoft username and password from a keepass file using kpcli
+
+    :returns: A tuple containing the username and password for Microsoft
+    :raises: `ValueError` if either `username` or `password` fail to fetch
+    """
+
     creds = []
 
     for value_to_fetch in ("username", "password"):
@@ -38,6 +45,14 @@ def get_microsoft_creds() -> Tuple[str, str]:
 
 
 def get_microsoft_otp() -> str:
+    """
+    Retrieve the Time based One Time Passcode from the keepass database using
+    kpcli
+
+    :returns: The OTP code
+    :raises: `ValueError` if OTP cannot be found
+    """
+
     fetch_command = (
         "kpcli --kdb=$HOME/Sync/secrets.kdbx --pwfile=keepass.txt --command "
         f"\"otp Passwords/Gaming/Microsoft\" | sed '/WARNING.*/d' | "
@@ -60,6 +75,8 @@ def get_microsoft_otp() -> str:
 
 
 def microsoft_login():
+    """Login to a Microsoft rewards account using Selenium"""
+
     DRIVER.get("https://rewards.bing.com")
     if DRIVER.title.lower().startswith("sign in to microsoft"):
         try:
