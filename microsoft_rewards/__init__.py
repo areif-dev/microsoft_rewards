@@ -48,5 +48,6 @@ def try_await_element(query_selector: str) -> WebElement:
     )
 
 
-WAIT_PERIOD = 4
+WAIT_PERIOD = 10
+SHORT_WAIT = 3
 DRIVER = webdriver.Firefox()

@@ -3,7 +3,10 @@ from typing import Tuple
 from selenium.webdriver.common.keys import Keys
 from . import DRIVER
 from . import await_essential_element
+from . import DRIVER, SHORT_WAIT
 import subprocess
+
+import time
 
 
 def get_microsoft_creds() -> Tuple[str, str]:
@@ -69,10 +72,12 @@ def microsoft_login():
 
         username_input = await_essential_element("input#i0116")
         username_input.send_keys(username, Keys.ENTER)
+        time.sleep(SHORT_WAIT)
 
         await_essential_element("#displayName")
         password_input = await_essential_element("input#i0118")
         password_input.send_keys(password, Keys.ENTER)
+        time.sleep(SHORT_WAIT)
 
         try:
             otp = get_microsoft_otp()
@@ -86,3 +91,4 @@ def microsoft_login():
 
         stay_signed_in_btn = await_essential_element("input.win-button#idBtn_Back")
         stay_signed_in_btn.click()
+        time.sleep(SHORT_WAIT)
