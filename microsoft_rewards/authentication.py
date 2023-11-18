@@ -1,9 +1,8 @@
 from typing import Tuple
 
 from selenium.webdriver.common.keys import Keys
-from . import DRIVER
-from . import await_essential_element
 from . import DRIVER, SHORT_WAIT
+from . import await_essential_element, try_await_element
 import subprocess
 
 import time
@@ -88,7 +87,11 @@ def microsoft_login():
 
         otp_input = await_essential_element("input#idTxtBx_SAOTCC_OTC")
         otp_input.send_keys(otp, Keys.ENTER)
-
-        stay_signed_in_btn = await_essential_element("input.win-button#idBtn_Back")
-        stay_signed_in_btn.click()
         time.sleep(SHORT_WAIT)
+
+        for i in range(5):
+            try:
+                try_await_element("input.win-button#idBtn_Back").click()
+                break
+            except:
+                continue
