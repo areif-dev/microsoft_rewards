@@ -3,6 +3,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 
 
 def await_essential_element(query_selector: str) -> WebElement:
@@ -50,4 +51,7 @@ def try_await_element(query_selector: str) -> WebElement:
 
 WAIT_PERIOD = 10
 SHORT_WAIT = 3
-DRIVER = webdriver.Firefox()
+
+options = Options()
+options.add_argument("-headless")
+DRIVER = webdriver.Firefox(options=options)

@@ -1,4 +1,4 @@
-from microsoft_rewards import try_await_element, SHORT_WAIT
+from microsoft_rewards import DRIVER, try_await_element, SHORT_WAIT
 from microsoft_rewards.authentication import microsoft_login
 from microsoft_rewards.rewards import (
     handle_daily_set,
@@ -20,3 +20,6 @@ if __name__ == "__main__":
         print("Failed to handle daily activities")
 
     run_searches()
+    for window in DRIVER.window_handles:
+        DRIVER.switch_to.window(window)
+        DRIVER.close()

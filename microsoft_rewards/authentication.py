@@ -80,6 +80,7 @@ def microsoft_login():
     DRIVER.get("https://rewards.bing.com")
     if DRIVER.title.lower().startswith("sign in to microsoft"):
         try:
+            print("Getting username and password")
             username, password = get_microsoft_creds()
         except ValueError as e:
             print("Could not log into Microsoft:", e)
@@ -96,6 +97,7 @@ def microsoft_login():
         time.sleep(SHORT_WAIT)
 
         try:
+            print("Getting OTP")
             otp = get_microsoft_otp()
         except ValueError as e:
             print("Could not read Microsoft OTP:", e)
@@ -108,7 +110,9 @@ def microsoft_login():
 
         for i in range(5):
             try:
+                print("Refuse saving login info")
                 try_await_element("input.win-button#idBtn_Back").click()
-                break
+                return
             except:
+                print("Could not find button to refuse saving login. Retrying")
                 continue
