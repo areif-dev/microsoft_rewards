@@ -26,8 +26,6 @@ def handle_daily_quiz():
     """Handles simple daily quizzes that are 5 to 10 questions long"""
 
     print("Entering daily quiz")
-    DRIVER.get("https://www.bing.com/search?q=weekly+quiz")
-    time.sleep(SHORT_WAIT / 2)
     while True:
         try:
             print("Answering question")
@@ -61,15 +59,28 @@ def handle_daily_set():
         By.XPATH, "//mee-rewards-daily-set-item-content/div/a"
     )
 
-    for i, card in enumerate(all_daily_sets[0:3]):
+    for card in all_daily_sets[0:3]:
         card_text = card.find_element(By.XPATH, ".//h3").text.lower()
-        print(card_text)
-        card.click()
+        try:
+            card.find_element(
+                By.XPATH, ".//span[contains(@class, 'mee-icon')]"
+            ).click()
+            time.sleep(SHORT_WAIT)
+        except:
+            continue
 
+        # Daily sets open in new tabs, which need to be explicitly focues
         for window_handle in DRIVER.window_handles:
             if window_handle != original_window:
                 DRIVER.switch_to.window(window_handle)
                 break
+
+        # Make sure the sign in button has been pressed
+        try:
+            DRIVER.find_element(By.XPATH, "//a[contains(text(), 'Sign in')]")
+            time.sleep(SHORT_WAIT)
+        except:
+            pass
 
         if "warpspeed" in card_text:
             try:
@@ -77,13 +88,13 @@ def handle_daily_set():
             except:
                 print("Could not start warpspeed quiz")
 
-        elif "poll" in card_text:
+        elif "daily poll" in card_text:
             try:
                 try_await_element("#btoption0").click()
             except:
                 print("Could not answer daily quiz")
 
-        elif "test" in card_text or "show what you know" in card_text:
+        elif "test" in card_text or "show what you know" in card_text or "a, b, or c" in card_text:
             try:
                 handle_daily_quiz()
             except:
